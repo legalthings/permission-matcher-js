@@ -9,7 +9,6 @@ const array_change_key_case = require('locutus/php/array/array_change_key_case')
 const ksort = require('locutus/php/array/ksort');
 const parse_url = require('locutus/php/url/parse_url');
 const parse_str = require('locutus/php/strings/parse_str');
-const array_unique = require('locutus/php/array/array_unique');
 const array_merge = require('locutus/php/array/array_merge');
 
 class PermissionMatcher {
@@ -24,8 +23,7 @@ class PermissionMatcher {
      * @param  {array}  authzGroups
      * @return {array}
      */
-    match(permissions, authzGroups)
-    {
+    match (permissions, authzGroups) {
         let privileges = [];
         
         for (let permissionAuthzGroup in permissions) {
@@ -48,8 +46,7 @@ class PermissionMatcher {
      * @param {array}    authzGroups
      * @param {function} callback
      */
-    hasMatchingAuthzGroup(permissionAuthzGroup, authzGroups, callback)
-    {
+    hasMatchingAuthzGroup (permissionAuthzGroup, authzGroups, callback) {
         authzGroups.forEach((authzGroup) => {
             if (this.authzGroupsAreEqual(permissionAuthzGroup, authzGroup)) {
                 return callback(true);
@@ -67,8 +64,7 @@ class PermissionMatcher {
      * @param  {string}  authzGroup
      * @return {boolean}
      */
-    authzGroupsAreEqual(permissionAuthzGroup, authzGroup)
-    {
+    authzGroupsAreEqual (permissionAuthzGroup, authzGroup) {
         return this.pathsAreEqual(permissionAuthzGroup, authzGroup) && 
             this.queryParamsAreEqual(permissionAuthzGroup, authzGroup);
     }
@@ -81,8 +77,7 @@ class PermissionMatcher {
      * @param  {string}  authzGroup
      * @return {boolean}
      */
-    pathsAreEqual(permissionAuthzGroup, authzGroup)
-    {
+    pathsAreEqual (permissionAuthzGroup, authzGroup) {
         let permissionAuthzGroupPath = rtrim(strtok(permissionAuthzGroup, '?'), '/');
         let authzGroupPath = rtrim(strtok(authzGroup, '?'), '/');
         return this.matchAuthzGroupPaths(permissionAuthzGroupPath, authzGroupPath) ||
@@ -97,8 +92,7 @@ class PermissionMatcher {
      * @param  {string}  subject
      * @return {boolean}
      */
-    matchAuthzGroupPaths(pattern, subject)
-    {
+    matchAuthzGroupPaths (pattern, subject) {
         let regex = '^' + str_replace('[^/]+', '\\*', preg_quote(pattern, '~')) + '';
         regex = str_replace('\\*', '(.*)', regex);
         regex = new RegExp(regex, 'i');
@@ -113,8 +107,7 @@ class PermissionMatcher {
      * @param  {string}  authzGroup
      * @return {boolean}
      */
-    queryParamsAreEqual(permissionAuthzGroup, authzGroup)
-    {
+    queryParamsAreEqual (permissionAuthzGroup, authzGroup) {
         let authzGroupQueryParams = array_change_key_case(this.getStringQueryParameters(authzGroup), 'CASE_LOWER');
         let permissionAuthzGroupQueryParams = array_change_key_case(this.getStringQueryParameters(permissionAuthzGroup), 'CASE_LOWER');
         ksort(authzGroupQueryParams);
@@ -129,8 +122,7 @@ class PermissionMatcher {
      * @param  {string} string
      * @return {array}
      */
-    getStringQueryParameters(string)
-    {
+    getStringQueryParameters (string) {
         let query = parse_url(string, 'PHP_URL_QUERY');
         let params = [];
         if (query) parse_str(query, params);
@@ -144,39 +136,15 @@ class PermissionMatcher {
      * @param  {array} input
      * @return {array}
      */
-    flatten(input)
-    {
+    flatten (input) {
         let list = [];
-        
+
         input.forEach((item) => {
             list = array_merge(list, [].concat(item));
         });
-        
+
         return [...new Set(list)];
     }
 }
 
 module.exports = PermissionMatcher;
-
-let matcher = new PermissionMatcher();
-
-let permissionsThatSomeUserHas = {
-    '/organizations/0001': ['full-access'],
-    '/organizations/0002?list=all': 'list',
-    '/organizations/0003/*/foo': ['read', 'write']
-};
-
-// console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/0001']));
-// outputs ['full-access']
-
-// console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/0001', '/organizations/0003/random/foo']));
-// outputs ['full-access', 'read', 'write']
-
-// console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/0002']));
-// outputs []
-
-// console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/0002?list=all']));
-// outputs ['list']
-
-// console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/*']));
-// outputs ['full-access', 'read', 'write', 'list']
