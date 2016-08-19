@@ -1,0 +1,26 @@
+{
+  "name": "permission-matcher-js",
+  "version": "1.0.0",
+  "description": "JavaScript port of legalthings/permission-matcher",
+  "main": "src/permission-matcher.js",
+  "scripts": {
+    "test": "node ./node_modules/mocha/bin/mocha ./tests/unit/permission-matcher.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/legalthings/permission-matcher-js.git"
+  },
+  "author": "LegalThings",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/legalthings/permission-matcher-js/issues"
+  },
+  "homepage": "https://github.com/legalthings/permission-matcher-js#readme",
+  "dependencies": {
+    "deep-equal": "^1.0.1",
+    "locutus": "^2.0.5"
+  },
+  "devDependencies": {
+    "mocha": "^3.0.2"
+  }
+}
