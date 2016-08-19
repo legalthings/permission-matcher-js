@@ -58,7 +58,11 @@ function testMatchWildcard () {
     let permissions = {
         'admin': 'read',
         'admin.support': 'write',
-        'admin.dev': 'develop'
+        'admin.dev': 'develop',
+        'admin.dev.tester': 'test',
+        'guest': 'find',
+        'guest.support': 'sing',
+        '*.support': 'dance'
     };
     assert.deepEqual(matcher.match(permissions, ['admin']), ['read']);
     assert.deepEqual(matcher.match(permissions, ['admin.*']), ['write', 'develop', 'test']);

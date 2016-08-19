@@ -5,7 +5,6 @@ const strtok = require('locutus/php/strings/strtok');
 const rtrim = require('locutus/php/strings/rtrim');
 const preg_quote = require('locutus/php/pcre/preg_quote');
 const str_replace = require('locutus/php/strings/str_replace');
-const array_change_key_case = require('locutus/php/array/array_change_key_case');
 const ksort = require('locutus/php/array/ksort');
 const parse_url = require('locutus/php/url/parse_url');
 const parse_str = require('locutus/php/strings/parse_str');
@@ -93,10 +92,10 @@ class PermissionMatcher {
      * @return {boolean}
      */
     matchAuthzGroupPaths (pattern, subject) {
-        let regex = '^' + str_replace('[^/]+', '\\*', preg_quote(pattern, '~')) + '';
+        let regex = '^' + str_replace('[^/]+', '\\*', preg_quote(pattern, '~')) + '$';
         regex = str_replace('\\*', '(.*)', regex);
         regex = new RegExp(regex, 'i');
-        return subject.match(regex, subject);
+        return subject.match(regex);
     }
 
     /**
@@ -108,8 +107,8 @@ class PermissionMatcher {
      * @return {boolean}
      */
     queryParamsAreEqual (permissionAuthzGroup, authzGroup) {
-        let authzGroupQueryParams = array_change_key_case(this.getStringQueryParameters(authzGroup), 'CASE_LOWER');
-        let permissionAuthzGroupQueryParams = array_change_key_case(this.getStringQueryParameters(permissionAuthzGroup), 'CASE_LOWER');
+        let authzGroupQueryParams = lowerCaseObjectKeys(this.getStringQueryParameters(authzGroup), 'CASE_LOWER');
+        let permissionAuthzGroupQueryParams = lowerCaseObjectKeys(this.getStringQueryParameters(permissionAuthzGroup), 'CASE_LOWER');
         ksort(authzGroupQueryParams);
         ksort(permissionAuthzGroupQueryParams);
         return equal(permissionAuthzGroupQueryParams, authzGroupQueryParams);
@@ -145,6 +144,19 @@ class PermissionMatcher {
 
         return [...new Set(list)];
     }
+}
+
+function lowerCaseObjectKeys (obj) {
+    let key, keys = Object.keys(obj);
+    let n = keys.length;
+    let newobj = {}
+
+    while (n--) {
+        key = keys[n];
+        newobj[key.toLowerCase()] = obj[key];
+    }
+
+    return newobj;
 }
 
 module.exports = PermissionMatcher;
