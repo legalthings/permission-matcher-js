@@ -10,5 +10,9 @@
     "permission"
   ],
   "license": "Apache2",
-  "ignore": ["./!(dist/permission-matcher.js)"]
+  "ignore": [
+    "*",
+    "!dist/",
+    "!dist/*"
+  ]
 }
