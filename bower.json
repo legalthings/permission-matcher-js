@@ -1,11 +1,11 @@
 {
   "name": "permission-matcher-js",
   "main": "dist/permission-matcher.js",
-  "homepage": "JavaScript port of legalthings/permission-matcher",
+  "homepage": "https://github.com/legalthings/permission-matcher-js#readme",
   "authors": [
     "LegalThings <info@legalthings.net>"
   ],
-  "description": "pdf.js build with viewer",
+  "description": "JavaScript port of legalthings/permission-matcher",
   "keywords": [
     "permission"
   ],
