@@ -5,15 +5,15 @@ Port of [legalthings/permission-matcher](https://github.com/legalthings/permissi
 With the permission matcher library, you can check whether a user is allowed to have access to specific resources.
 Specifying resources and access control levels is up to the client of the library.
 
-## Requirements
-
-- [Node.js (ES6)](https://nodejs.org) >= 5.0.0
-
 ## Installation
 
-The library can be installed using composer.
+The library can be installed using npm.
 
     npm install permission-matcher-js
+
+It can also be installed with bower.
+
+    bower install permission-matcher-js
 
 ## How it works
 
@@ -45,5 +45,5 @@ console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/0002?list
 // outputs ['list']
 
 console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/*']));
-// outputs ['full-access', 'read', 'write', 'list']
+// outputs ['full-access', 'read', 'write']
 ```
