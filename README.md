@@ -13,7 +13,7 @@ Specifying resources and access control levels is up to the client of the librar
 
 The library can be installed using composer.
 
-    npm install permission-matcher
+    npm install permission-matcher-js
 
 ## How it works
 
@@ -23,7 +23,7 @@ In the example we have a user that has certain permissions attached to him. We c
 Note that you can use wildcards `*`.
 
 ```javascript
-const PermissionMatcher = require('permission-matcher');
+const PermissionMatcher = require('permission-matcher-js');
 const matcher = new PermissionMatcher();
 
 let permissionsThatSomeUserHas = {
