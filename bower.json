@@ -1,0 +1,19 @@
+{
+  "name": "permission-matcher-js",
+  "main": "dist/permission-matcher.js",
+  "homepage": "JavaScript port of legalthings/permission-matcher",
+  "authors": [
+    "LegalThings <info@legalthings.net>"
+  ],
+  "description": "pdf.js build with viewer",
+  "keywords": [
+    "permission"
+  ],
+  "license": "Apache2",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    "tests",
+    "src"
+  ]
+}
