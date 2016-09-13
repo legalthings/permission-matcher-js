@@ -47,3 +47,10 @@ console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/0002?list
 console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/*']));
 // outputs ['full-access', 'read', 'write']
 ```
+
+## Bower
+When changes are made to the source `/src/permission-matcher.js` make sure to update the bower version aswell.
+
+	browserify src/permission-matcher.js -o dist/permission-matcher.js --standalone PermissionMatcher
+
+This process will be automated in the future.

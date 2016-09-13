@@ -931,6 +931,8 @@ module.exports = function parse_url(str, component) {
 };
 
 },{"../info/ini_get":8}],16:[function(require,module,exports){
+'use strict';
+
 const equal = require('deep-equal');
 const strtok = require('locutus/php/strings/strtok');
 const rtrim = require('locutus/php/strings/rtrim');

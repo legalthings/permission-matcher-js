@@ -1,3 +1,5 @@
+'use strict';
+
 const equal = require('deep-equal');
 const strtok = require('locutus/php/strings/strtok');
 const rtrim = require('locutus/php/strings/rtrim');
