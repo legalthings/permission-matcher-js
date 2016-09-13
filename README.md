@@ -48,9 +48,9 @@ console.log(matcher.match(permissionsThatSomeUserHas, ['/organizations/*']));
 // outputs ['full-access', 'read', 'write']
 ```
 
-## Bower
-When changes are made to the source `/src/permission-matcher.js` make sure to update the bower version aswell.
+## Releasing a new build
+When changes are made to the source `/src/permission-matcher.js`, which is used for `NPM`, make sure to update the `Bower` version aswell.
+Note that this process is currently done manually and should be automated in the future.
 
-	browserify src/permission-matcher.js -o dist/permission-matcher.js --standalone PermissionMatcher
-
-This process will be automated in the future.
+	npm run browserify
+	npm run babel

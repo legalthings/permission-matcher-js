@@ -10,10 +10,5 @@
     "permission"
   ],
   "license": "Apache2",
-  "ignore": [
-    "node_modules",
-    "bower_components",
-    "tests",
-    "src"
-  ]
+  "ignore": ["./!(dist/permission-matcher.js)"]
 }
