@@ -1075,7 +1075,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var regex = '^' + str_replace('[^/]+', '\\*', preg_quote(pattern, '~')) + '$';
             regex = str_replace('\\*', '(.*)', regex);
             regex = new RegExp(regex, 'i');
-            return subject.match(regex);
+
+            var invert = pattern.startsWith('!');
+            var match = subject.match(regex);
+
+            return invert ? !match : match;
           }
 
           /**
@@ -1090,8 +1094,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
           key: "queryParamsAreEqual",
           value: function queryParamsAreEqual(permissionAuthzGroup, authzGroup) {
-            var authzGroupQueryParams = lowerCaseObjectKeys(this.getStringQueryParameters(authzGroup), 'CASE_LOWER');
-            var permissionAuthzGroupQueryParams = lowerCaseObjectKeys(this.getStringQueryParameters(permissionAuthzGroup), 'CASE_LOWER');
+            var authzGroupQueryParams = this.lowerCaseObjectKeys(this.getStringQueryParameters(authzGroup), 'CASE_LOWER');
+            var permissionAuthzGroupQueryParams = this.lowerCaseObjectKeys(this.getStringQueryParameters(permissionAuthzGroup), 'CASE_LOWER');
             ksort(authzGroupQueryParams);
             ksort(permissionAuthzGroupQueryParams);
             return equal(permissionAuthzGroupQueryParams, authzGroupQueryParams);
@@ -1133,24 +1137,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             return [].concat(_toConsumableArray(new Set(list)));
           }
+
+          /**
+           * Lowercases the keys of an object
+           *
+           * @protected
+           * @param  {object} object
+           * @return {array}
+           */
+
+        }, {
+          key: "lowerCaseObjectKeys",
+          value: function lowerCaseObjectKeys(object) {
+            var key = void 0,
+                keys = Object.keys(object);
+            var n = keys.length;
+            var newObject = {};
+
+            while (n--) {
+              key = keys[n];
+              newObject[key.toLowerCase()] = object[key];
+            }
+
+            return newObject;
+          }
         }]);
 
         return PermissionMatcher;
       }();
-
-      function lowerCaseObjectKeys(obj) {
-        var key = void 0,
-            keys = Object.keys(obj);
-        var n = keys.length;
-        var newobj = {};
-
-        while (n--) {
-          key = keys[n];
-          newobj[key.toLowerCase()] = obj[key];
-        }
-
-        return newobj;
-      }
 
       module.exports = PermissionMatcher;
     }, { "deep-equal": 1, "locutus/php/array/array_merge": 5, "locutus/php/array/ksort": 6, "locutus/php/pcre/preg_quote": 9, "locutus/php/strings/parse_str": 10, "locutus/php/strings/rtrim": 11, "locutus/php/strings/str_replace": 12, "locutus/php/strings/strtok": 14, "locutus/php/url/parse_url": 15 }] }, {}, [16])(16);

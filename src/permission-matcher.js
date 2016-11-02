@@ -23,10 +23,10 @@ class PermissionMatcher {
      * @return {array}
      */
     match (permissions, authzGroups) {
-        let privileges = [];
+        const privileges = [];
         
         for (let permissionAuthzGroup in permissions) {
-            let permissionPrivileges = permissions[permissionAuthzGroup];
+            const permissionPrivileges = permissions[permissionAuthzGroup];
 
             this.hasMatchingAuthzGroup(permissionAuthzGroup, authzGroups, (matches) => {
                 if (!matches) return;
@@ -77,8 +77,8 @@ class PermissionMatcher {
      * @return {boolean}
      */
     pathsAreEqual (permissionAuthzGroup, authzGroup) {
-        let permissionAuthzGroupPath = rtrim(strtok(permissionAuthzGroup, '?'), '/');
-        let authzGroupPath = rtrim(strtok(authzGroup, '?'), '/');
+        const permissionAuthzGroupPath = rtrim(strtok(permissionAuthzGroup, '?'), '/');
+        const authzGroupPath = rtrim(strtok(authzGroup, '?'), '/');
         return this.matchAuthzGroupPaths(permissionAuthzGroupPath, authzGroupPath) ||
             this.matchAuthzGroupPaths(authzGroupPath, permissionAuthzGroupPath);
     }
@@ -95,7 +95,11 @@ class PermissionMatcher {
         let regex = '^' + str_replace('[^/]+', '\\*', preg_quote(pattern, '~')) + '$';
         regex = str_replace('\\*', '(.*)', regex);
         regex = new RegExp(regex, 'i');
-        return subject.match(regex);
+        
+        const invert = pattern.startsWith('!');
+        const match = subject.match(regex);
+        
+        return invert ? !match : match;
     }
 
     /**
@@ -107,8 +111,8 @@ class PermissionMatcher {
      * @return {boolean}
      */
     queryParamsAreEqual (permissionAuthzGroup, authzGroup) {
-        let authzGroupQueryParams = lowerCaseObjectKeys(this.getStringQueryParameters(authzGroup), 'CASE_LOWER');
-        let permissionAuthzGroupQueryParams = lowerCaseObjectKeys(this.getStringQueryParameters(permissionAuthzGroup), 'CASE_LOWER');
+        let authzGroupQueryParams = this.lowerCaseObjectKeys(this.getStringQueryParameters(authzGroup), 'CASE_LOWER');
+        let permissionAuthzGroupQueryParams = this.lowerCaseObjectKeys(this.getStringQueryParameters(permissionAuthzGroup), 'CASE_LOWER');
         ksort(authzGroupQueryParams);
         ksort(permissionAuthzGroupQueryParams);
         return equal(permissionAuthzGroupQueryParams, authzGroupQueryParams);
@@ -122,8 +126,8 @@ class PermissionMatcher {
      * @return {array}
      */
     getStringQueryParameters (string) {
-        let query = parse_url(string, 'PHP_URL_QUERY');
-        let params = [];
+        const query = parse_url(string, 'PHP_URL_QUERY');
+        const params = [];
         if (query) parse_str(query, params);
         return params;
     }
@@ -144,19 +148,26 @@ class PermissionMatcher {
 
         return [...new Set(list)];
     }
-}
 
-function lowerCaseObjectKeys (obj) {
-    let key, keys = Object.keys(obj);
-    let n = keys.length;
-    let newobj = {}
+    /**
+     * Lowercases the keys of an object
+     *
+     * @protected
+     * @param  {object} object
+     * @return {array}
+     */
+    lowerCaseObjectKeys (object) {
+       let key, keys = Object.keys(object);
+       let n = keys.length;
+       let newObject = {}
 
-    while (n--) {
-        key = keys[n];
-        newobj[key.toLowerCase()] = obj[key];
+       while (n--) {
+           key = keys[n];
+           newObject[key.toLowerCase()] = object[key];
+       }
+
+       return newObject;
     }
-
-    return newobj;
 }
 
 module.exports = PermissionMatcher;
