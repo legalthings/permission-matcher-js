@@ -15,11 +15,12 @@ describe('PermissionMatcher', function() {
         it('should match resources with query params', testMatchResourceWithQueryParams);
         it('should match resources with wildcard query params', testMatchWildcardResource);
         it('should match resources with insensitive query params', testMatchCaseInsensitiveQueryParams);
+        it('should match inverted permissions', testMatchInverted);
     });
 });
 
 function testMatchString () {
-    let permissions = {
+    const permissions = {
         'admin': 'write',
         'guest': 'read'
     };
@@ -31,7 +32,7 @@ function testMatchString () {
 }
 
 function testMatchArray () {
-    let permissions = {
+    const permissions = {
         'admin': ['read', 'write'],
         'guest': ['read'],
         'owner': ['manage']
@@ -44,7 +45,7 @@ function testMatchArray () {
 }
 
 function testMatchNested () {
-    let permissions = {
+    const permissions = {
         'admin': 'read',
         'admin.support': 'write',
         'admin.dev': 'develop'
@@ -55,7 +56,7 @@ function testMatchNested () {
 }
 
 function testMatchWildcard () {
-    let permissions = {
+    const permissions = {
         'admin': 'read',
         'admin.support': 'write',
         'admin.dev': 'develop',
@@ -76,7 +77,7 @@ function testMatchWildcard () {
 }
 
 function testMatchCaseInsensitivePath () {
-    let permissions = {
+    const permissions = {
         'AdMiN': 'read'
     };
     assert.deepEqual(matcher.match(permissions, ['admin']), ['read']);
@@ -86,7 +87,7 @@ function testMatchCaseInsensitivePath () {
 }
 
 function testMatchResource () {
-    let permissions = {
+    const permissions = {
         '/admin': 'read',
         '/admin/support': 'write',
         '/admin/dev': 'develop',
@@ -102,7 +103,7 @@ function testMatchResource () {
 }
 
 function testMatchResourceWithQueryParams () {
-    let permissions = {
+    const permissions = {
         '/admin': 'read',
         '/admin?role=support': 'write',
         '/admin?role=dev': 'develop',
@@ -118,7 +119,7 @@ function testMatchResourceWithQueryParams () {
 }
 
 function testMatchWildcardResource () {
-    let permissions = {
+    const permissions = {
         '/admin': 'read',
         '/admin/support': 'write',
         '/admin/dev': 'develop',
@@ -139,11 +140,21 @@ function testMatchWildcardResource () {
 }
 
 function testMatchCaseInsensitiveQueryParams () {
-    let permissions = {
+    const permissions = {
         '/admin?ROlE=support': 'write',
         '/admin?Job=lawyer&FROM=amsterdam': 'party'
     };
     assert.deepEqual(matcher.match(permissions, ['/admin?role=support']), ['write']);
     assert.deepEqual(matcher.match(permissions, ['/admin?RolE=support']), ['write']);
     assert.deepEqual(matcher.match(permissions, ['/admin?joB=lawyer&FroM=amsterdam']), ['party']);
+}
+
+function testMatchInverted () {
+    const permissions = {
+        '!admin': 'read',
+        'admin': ['read', 'write']
+    };
+    assert.deepEqual(matcher.match(permissions, ['admin']), ['read', 'write']);
+    assert.deepEqual(matcher.match(permissions, ['guest']), ['read']);
+    assert.deepEqual(matcher.match(permissions, ['foo']), ['read']);
 }
