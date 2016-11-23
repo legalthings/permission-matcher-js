@@ -24,7 +24,7 @@ class PermissionMatcher {
      */
     match (permissions, authzGroups) {
         const privileges = [];
-        
+
         for (let permissionAuthzGroup in permissions) {
             const permissionPrivileges = permissions[permissionAuthzGroup];
 
@@ -64,7 +64,7 @@ class PermissionMatcher {
      * @return {boolean}
      */
     authzGroupsAreEqual (permissionAuthzGroup, authzGroup) {
-        return this.pathsAreEqual(permissionAuthzGroup, authzGroup) && 
+        return this.pathsAreEqual(permissionAuthzGroup, authzGroup) &&
             this.queryParamsAreEqual(permissionAuthzGroup, authzGroup);
     }
 
@@ -84,7 +84,7 @@ class PermissionMatcher {
     }
 
     /**
-     * Check if one paths mathes the other 
+     * Check if one paths mathes the other
      *
      * @protected
      * @param  {string}  pattern
@@ -95,10 +95,11 @@ class PermissionMatcher {
         let regex = '^' + str_replace('[^/]+', '\\*', preg_quote(pattern, '~')) + '$';
         regex = str_replace('\\*', '(.*)', regex);
         regex = new RegExp(regex, 'i');
-        
-        const invert = pattern.startsWith('!');
+
+        const token = '!';
+        const invert = pattern.substr(0, token.length) === token;
         const match = subject.match(regex);
-        
+
         return invert ? !match : match;
     }
 
