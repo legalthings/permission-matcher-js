@@ -16,6 +16,7 @@ describe('PermissionMatcher', function() {
         it('should match resources with wildcard query params', testMatchWildcardResource);
         it('should match resources with insensitive query params', testMatchCaseInsensitiveQueryParams);
         it('should match inverted permissions', testMatchInverted);
+        it('should match permissions where the priviliges are the keys and authzgroups the values', testMatchReverse);
     });
 });
 
@@ -157,4 +158,42 @@ function testMatchInverted () {
     assert.deepEqual(matcher.match(permissions, ['admin']), ['read', 'write']);
     assert.deepEqual(matcher.match(permissions, ['guest']), ['read']);
     assert.deepEqual(matcher.match(permissions, ['foo']), ['read']);
+}
+
+function testMatchReverse () {
+    const permissions = {
+        'admin': 'read',
+        'admin.support': 'write',
+        'admin.dev': 'develop',
+        'admin.dev.tester': 'test',
+        'guest': 'find',
+        'guest.support': 'sing',
+        '*.support': 'dance'
+    };
+    
+    assert.deepEqual(matcher.match(permissions, ['admin'], true), {
+        'read': ['admin']
+    });
+
+    assert.deepEqual(matcher.match(permissions, ['admin.*'], true), {
+        'write': ['admin.support', 'admin.*'],
+        'develop': ['admin.dev', 'admin.*'],
+        'test': ['admin.dev.tester', 'admin.*']
+    });
+
+    assert.deepEqual(matcher.match(permissions, ['admin.*.*'], true), {
+        'test': ['admin.dev.tester', 'admin.*.*']
+    });
+    
+    assert.deepEqual(matcher.match(permissions, ['admin', 'admin.*'], true), {
+        'read': ['admin'],
+        'write': ['admin.support', 'admin.*'],
+        'develop': ['admin.dev', 'admin.*'],
+        'test': ['admin.dev.tester', 'admin.*']
+    });
+
+    assert.deepEqual(matcher.match(permissions, ['admin.d*'], true), {
+        'develop': ['admin.dev', 'admin.d*'],
+        'test': ['admin.dev.tester', 'admin.d*']
+    });
 }

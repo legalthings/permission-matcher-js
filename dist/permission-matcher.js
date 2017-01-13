@@ -2,7 +2,7 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -296,177 +296,171 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return retObj;
       };
     }, {}], 6: [function (require, module, exports) {
-      (function (global) {
-        'use strict';
+      'use strict';
 
-        module.exports = function ksort(inputArr, sortFlags) {
-          //  discuss at: http://locutus.io/php/ksort/
-          // original by: GeekFG (http://geekfg.blogspot.com)
-          // improved by: Kevin van Zonneveld (http://kvz.io)
-          // improved by: Brett Zamir (http://brett-zamir.me)
-          //      note 1: This function deviates from PHP in returning a copy of the array instead
-          //      note 1: of acting by reference and returning true; this was necessary because
-          //      note 1: IE does not allow deleting and re-adding of properties without caching
-          //      note 1: of property position; you can set the ini of "locutus.sortByReference" to true to
-          //      note 1: get the PHP behavior, but use this only if you are in an environment
-          //      note 1: such as Firefox extensions where for-in iteration order is fixed and true
-          //      note 1: property deletion is supported. Note that we intend to implement the PHP
-          //      note 1: behavior by default if IE ever does allow it; only gives shallow copy since
-          //      note 1: is by reference in PHP anyways
-          //      note 1: Since JS objects' keys are always strings, and (the
-          //      note 1: default) SORT_REGULAR flag distinguishes by key type,
-          //      note 1: if the content is a numeric string, we treat the
-          //      note 1: "original type" as numeric.
-          //   example 1: var $data = {d: 'lemon', a: 'orange', b: 'banana', c: 'apple'}
-          //   example 1: ksort($data)
-          //   example 1: var $result = $data
-          //   returns 1: {a: 'orange', b: 'banana', c: 'apple', d: 'lemon'}
-          //   example 2: ini_set('locutus.sortByReference', true)
-          //   example 2: var $data = {2: 'van', 3: 'Zonneveld', 1: 'Kevin'}
-          //   example 2: ksort($data)
-          //   example 2: var $result = $data
-          //   returns 2: {1: 'Kevin', 2: 'van', 3: 'Zonneveld'}
+      module.exports = function ksort(inputArr, sortFlags) {
+        //  discuss at: http://locutus.io/php/ksort/
+        // original by: GeekFG (http://geekfg.blogspot.com)
+        // improved by: Kevin van Zonneveld (http://kvz.io)
+        // improved by: Brett Zamir (http://brett-zamir.me)
+        //      note 1: This function deviates from PHP in returning a copy of the array instead
+        //      note 1: of acting by reference and returning true; this was necessary because
+        //      note 1: IE does not allow deleting and re-adding of properties without caching
+        //      note 1: of property position; you can set the ini of "locutus.sortByReference" to true to
+        //      note 1: get the PHP behavior, but use this only if you are in an environment
+        //      note 1: such as Firefox extensions where for-in iteration order is fixed and true
+        //      note 1: property deletion is supported. Note that we intend to implement the PHP
+        //      note 1: behavior by default if IE ever does allow it; only gives shallow copy since
+        //      note 1: is by reference in PHP anyways
+        //      note 1: Since JS objects' keys are always strings, and (the
+        //      note 1: default) SORT_REGULAR flag distinguishes by key type,
+        //      note 1: if the content is a numeric string, we treat the
+        //      note 1: "original type" as numeric.
+        //   example 1: var $data = {d: 'lemon', a: 'orange', b: 'banana', c: 'apple'}
+        //   example 1: ksort($data)
+        //   example 1: var $result = $data
+        //   returns 1: {a: 'orange', b: 'banana', c: 'apple', d: 'lemon'}
+        //   example 2: ini_set('locutus.sortByReference', true)
+        //   example 2: var $data = {2: 'van', 3: 'Zonneveld', 1: 'Kevin'}
+        //   example 2: ksort($data)
+        //   example 2: var $result = $data
+        //   returns 2: {1: 'Kevin', 2: 'van', 3: 'Zonneveld'}
 
-          var i18nlgd = require('../i18n/i18n_loc_get_default');
-          var strnatcmp = require('../strings/strnatcmp');
+        var i18nlgd = require('../i18n/i18n_loc_get_default');
+        var strnatcmp = require('../strings/strnatcmp');
 
-          var tmpArr = {};
-          var keys = [];
-          var sorter;
-          var i;
-          var k;
-          var sortByReference = false;
-          var populateArr = {};
+        var tmpArr = {};
+        var keys = [];
+        var sorter;
+        var i;
+        var k;
+        var sortByReference = false;
+        var populateArr = {};
 
-          var $global = typeof window !== 'undefined' ? window : global;
-          $global.$locutus = $global.$locutus || {};
-          var $locutus = $global.$locutus;
-          $locutus.php = $locutus.php || {};
-          $locutus.php.locales = $locutus.php.locales || {};
+        var $global = typeof window !== 'undefined' ? window : GLOBAL;
+        $global.$locutus = $global.$locutus || {};
+        var $locutus = $global.$locutus;
+        $locutus.php = $locutus.php || {};
+        $locutus.php.locales = $locutus.php.locales || {};
 
-          switch (sortFlags) {
-            case 'SORT_STRING':
-              // compare items as strings
-              sorter = function sorter(a, b) {
-                return strnatcmp(b, a);
-              };
-              break;
-            case 'SORT_LOCALE_STRING':
-              // compare items as strings, based on the current locale
-              // (set with i18n_loc_set_default() as of PHP6)
-              var loc = i18nlgd();
-              sorter = $locutus.locales[loc].sorting;
-              break;
-            case 'SORT_NUMERIC':
-              // compare items numerically
-              sorter = function sorter(a, b) {
-                return a + 0 - (b + 0);
-              };
-              break;
-            default:
-              // case 'SORT_REGULAR': // compare items normally (don't change types)
-              sorter = function sorter(a, b) {
-                var aFloat = parseFloat(a);
-                var bFloat = parseFloat(b);
-                var aNumeric = aFloat + '' === a;
-                var bNumeric = bFloat + '' === b;
-                if (aNumeric && bNumeric) {
-                  return aFloat > bFloat ? 1 : aFloat < bFloat ? -1 : 0;
-                } else if (aNumeric && !bNumeric) {
-                  return 1;
-                } else if (!aNumeric && bNumeric) {
-                  return -1;
-                }
-                return a > b ? 1 : a < b ? -1 : 0;
-              };
-              break;
+        switch (sortFlags) {
+          case 'SORT_STRING':
+            // compare items as strings
+            sorter = function sorter(a, b) {
+              return strnatcmp(b, a);
+            };
+            break;
+          case 'SORT_LOCALE_STRING':
+            // compare items as strings, based on the current locale
+            // (set with i18n_loc_set_default() as of PHP6)
+            var loc = i18nlgd();
+            sorter = $locutus.locales[loc].sorting;
+            break;
+          case 'SORT_NUMERIC':
+            // compare items numerically
+            sorter = function sorter(a, b) {
+              return a + 0 - (b + 0);
+            };
+            break;
+          default:
+            // case 'SORT_REGULAR': // compare items normally (don't change types)
+            sorter = function sorter(a, b) {
+              var aFloat = parseFloat(a);
+              var bFloat = parseFloat(b);
+              var aNumeric = aFloat + '' === a;
+              var bNumeric = bFloat + '' === b;
+              if (aNumeric && bNumeric) {
+                return aFloat > bFloat ? 1 : aFloat < bFloat ? -1 : 0;
+              } else if (aNumeric && !bNumeric) {
+                return 1;
+              } else if (!aNumeric && bNumeric) {
+                return -1;
+              }
+              return a > b ? 1 : a < b ? -1 : 0;
+            };
+            break;
+        }
+
+        // Make a list of key names
+        for (k in inputArr) {
+          if (inputArr.hasOwnProperty(k)) {
+            keys.push(k);
           }
+        }
+        keys.sort(sorter);
 
-          // Make a list of key names
-          for (k in inputArr) {
-            if (inputArr.hasOwnProperty(k)) {
-              keys.push(k);
-            }
+        var iniVal = (typeof require !== 'undefined' ? require('../info/ini_get')('locutus.sortByReference') : undefined) || 'on';
+        sortByReference = iniVal === 'on';
+        populateArr = sortByReference ? inputArr : populateArr;
+
+        // Rebuild array with sorted key names
+        for (i = 0; i < keys.length; i++) {
+          k = keys[i];
+          tmpArr[k] = inputArr[k];
+          if (sortByReference) {
+            delete inputArr[k];
           }
-          keys.sort(sorter);
-
-          var iniVal = (typeof require !== 'undefined' ? require('../info/ini_get')('locutus.sortByReference') : undefined) || 'on';
-          sortByReference = iniVal === 'on';
-          populateArr = sortByReference ? inputArr : populateArr;
-
-          // Rebuild array with sorted key names
-          for (i = 0; i < keys.length; i++) {
-            k = keys[i];
-            tmpArr[k] = inputArr[k];
-            if (sortByReference) {
-              delete inputArr[k];
-            }
+        }
+        for (i in tmpArr) {
+          if (tmpArr.hasOwnProperty(i)) {
+            populateArr[i] = tmpArr[i];
           }
-          for (i in tmpArr) {
-            if (tmpArr.hasOwnProperty(i)) {
-              populateArr[i] = tmpArr[i];
-            }
-          }
+        }
 
-          return sortByReference || populateArr;
-        };
-      }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
+        return sortByReference || populateArr;
+      };
     }, { "../i18n/i18n_loc_get_default": 7, "../info/ini_get": 8, "../strings/strnatcmp": 13 }], 7: [function (require, module, exports) {
-      (function (global) {
-        'use strict';
+      'use strict';
 
-        module.exports = function i18n_loc_get_default() {
-          // eslint-disable-line camelcase
-          //  discuss at: http://locutus.io/php/i18n_loc_get_default/
-          // original by: Brett Zamir (http://brett-zamir.me)
-          //      note 1: Renamed in PHP6 from locale_get_default(). Not listed yet at php.net.
-          //      note 1: List of locales at <http://demo.icu-project.org/icu-bin/locexp>
-          //      note 1: To be usable with sort() if it is passed the `SORT_LOCALE_STRING`
-          //      note 1: sorting flag: http://php.net/manual/en/function.sort.php
-          //   example 1: i18n_loc_get_default()
-          //   returns 1: 'en_US_POSIX'
-          //   example 2: i18n_loc_set_default('pt_PT')
-          //   example 2: i18n_loc_get_default()
-          //   returns 2: 'pt_PT'
+      module.exports = function i18n_loc_get_default() {
+        // eslint-disable-line camelcase
+        //  discuss at: http://locutus.io/php/i18n_loc_get_default/
+        // original by: Brett Zamir (http://brett-zamir.me)
+        //      note 1: Renamed in PHP6 from locale_get_default(). Not listed yet at php.net.
+        //      note 1: List of locales at <http://demo.icu-project.org/icu-bin/locexp>
+        //      note 1: To be usable with sort() if it is passed the `SORT_LOCALE_STRING`
+        //      note 1: sorting flag: http://php.net/manual/en/function.sort.php
+        //   example 1: i18n_loc_get_default()
+        //   returns 1: 'en_US_POSIX'
+        //   example 2: i18n_loc_set_default('pt_PT')
+        //   example 2: i18n_loc_get_default()
+        //   returns 2: 'pt_PT'
 
-          var $global = typeof window !== 'undefined' ? window : global;
-          $global.$locutus = $global.$locutus || {};
-          var $locutus = $global.$locutus;
-          $locutus.php = $locutus.php || {};
-          $locutus.php.locales = $locutus.php.locales || {};
+        var $global = typeof window !== 'undefined' ? window : GLOBAL;
+        $global.$locutus = $global.$locutus || {};
+        var $locutus = $global.$locutus;
+        $locutus.php = $locutus.php || {};
+        $locutus.php.locales = $locutus.php.locales || {};
 
-          return $locutus.php.locale_default || 'en_US_POSIX';
-        };
-      }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
+        return $locutus.php.locale_default || 'en_US_POSIX';
+      };
     }, {}], 8: [function (require, module, exports) {
-      (function (global) {
-        'use strict';
+      'use strict';
 
-        module.exports = function ini_get(varname) {
-          // eslint-disable-line camelcase
-          //  discuss at: http://locutus.io/php/ini_get/
-          // original by: Brett Zamir (http://brett-zamir.me)
-          //      note 1: The ini values must be set by ini_set or manually within an ini file
-          //   example 1: ini_set('date.timezone', 'Asia/Hong_Kong')
-          //   example 1: ini_get('date.timezone')
-          //   returns 1: 'Asia/Hong_Kong'
+      module.exports = function ini_get(varname) {
+        // eslint-disable-line camelcase
+        //  discuss at: http://locutus.io/php/ini_get/
+        // original by: Brett Zamir (http://brett-zamir.me)
+        //      note 1: The ini values must be set by ini_set or manually within an ini file
+        //   example 1: ini_set('date.timezone', 'Asia/Hong_Kong')
+        //   example 1: ini_get('date.timezone')
+        //   returns 1: 'Asia/Hong_Kong'
 
-          var $global = typeof window !== 'undefined' ? window : global;
-          $global.$locutus = $global.$locutus || {};
-          var $locutus = $global.$locutus;
-          $locutus.php = $locutus.php || {};
-          $locutus.php.ini = $locutus.php.ini || {};
+        var $global = typeof window !== 'undefined' ? window : GLOBAL;
+        $global.$locutus = $global.$locutus || {};
+        var $locutus = $global.$locutus;
+        $locutus.php = $locutus.php || {};
+        $locutus.php.ini = $locutus.php.ini || {};
 
-          if ($locutus.php.ini[varname] && $locutus.php.ini[varname].local_value !== undefined) {
-            if ($locutus.php.ini[varname].local_value === null) {
-              return '';
-            }
-            return $locutus.php.ini[varname].local_value;
+        if ($locutus.php.ini[varname] && $locutus.php.ini[varname].local_value !== undefined) {
+          if ($locutus.php.ini[varname].local_value === null) {
+            return '';
           }
+          return $locutus.php.ini[varname].local_value;
+        }
 
-          return '';
-        };
-      }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
+        return '';
+      };
     }, {}], 9: [function (require, module, exports) {
       'use strict';
 
@@ -488,143 +482,141 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
       };
     }, {}], 10: [function (require, module, exports) {
-      (function (global) {
-        'use strict';
+      'use strict';
 
-        module.exports = function parse_str(str, array) {
-          // eslint-disable-line camelcase
-          //       discuss at: http://locutus.io/php/parse_str/
-          //      original by: Cagri Ekin
-          //      improved by: Michael White (http://getsprink.com)
-          //      improved by: Jack
-          //      improved by: Brett Zamir (http://brett-zamir.me)
-          //      bugfixed by: Onno Marsman (https://twitter.com/onnomarsman)
-          //      bugfixed by: Brett Zamir (http://brett-zamir.me)
-          //      bugfixed by: stag019
-          //      bugfixed by: Brett Zamir (http://brett-zamir.me)
-          //      bugfixed by: MIO_KODUKI (http://mio-koduki.blogspot.com/)
-          // reimplemented by: stag019
-          //         input by: Dreamer
-          //         input by: Zaide (http://zaidesthings.com/)
-          //         input by: David Pesta (http://davidpesta.com/)
-          //         input by: jeicquest
-          //           note 1: When no argument is specified, will put variables in global scope.
-          //           note 1: When a particular argument has been passed, and the
-          //           note 1: returned value is different parse_str of PHP.
-          //           note 1: For example, a=b=c&d====c
-          //        example 1: var $arr = {}
-          //        example 1: parse_str('first=foo&second=bar', $arr)
-          //        example 1: var $result = $arr
-          //        returns 1: { first: 'foo', second: 'bar' }
-          //        example 2: var $arr = {}
-          //        example 2: parse_str('str_a=Jack+and+Jill+didn%27t+see+the+well.', $arr)
-          //        example 2: var $result = $arr
-          //        returns 2: { str_a: "Jack and Jill didn't see the well." }
-          //        example 3: var $abc = {3:'a'}
-          //        example 3: parse_str('a[b]["c"]=def&a[q]=t+5', $abc)
-          //        example 3: var $result = $abc
-          //        returns 3: {"3":"a","a":{"b":{"c":"def"},"q":"t 5"}}
+      module.exports = function parse_str(str, array) {
+        // eslint-disable-line camelcase
+        //       discuss at: http://locutus.io/php/parse_str/
+        //      original by: Cagri Ekin
+        //      improved by: Michael White (http://getsprink.com)
+        //      improved by: Jack
+        //      improved by: Brett Zamir (http://brett-zamir.me)
+        //      bugfixed by: Onno Marsman (https://twitter.com/onnomarsman)
+        //      bugfixed by: Brett Zamir (http://brett-zamir.me)
+        //      bugfixed by: stag019
+        //      bugfixed by: Brett Zamir (http://brett-zamir.me)
+        //      bugfixed by: MIO_KODUKI (http://mio-koduki.blogspot.com/)
+        // reimplemented by: stag019
+        //         input by: Dreamer
+        //         input by: Zaide (http://zaidesthings.com/)
+        //         input by: David Pesta (http://davidpesta.com/)
+        //         input by: jeicquest
+        //           note 1: When no argument is specified, will put variables in global scope.
+        //           note 1: When a particular argument has been passed, and the
+        //           note 1: returned value is different parse_str of PHP.
+        //           note 1: For example, a=b=c&d====c
+        //        example 1: var $arr = {}
+        //        example 1: parse_str('first=foo&second=bar', $arr)
+        //        example 1: var $result = $arr
+        //        returns 1: { first: 'foo', second: 'bar' }
+        //        example 2: var $arr = {}
+        //        example 2: parse_str('str_a=Jack+and+Jill+didn%27t+see+the+well.', $arr)
+        //        example 2: var $result = $arr
+        //        returns 2: { str_a: "Jack and Jill didn't see the well." }
+        //        example 3: var $abc = {3:'a'}
+        //        example 3: parse_str('a[b]["c"]=def&a[q]=t+5', $abc)
+        //        example 3: var $result = $abc
+        //        returns 3: {"3":"a","a":{"b":{"c":"def"},"q":"t 5"}}
 
-          var strArr = String(str).replace(/^&/, '').replace(/&$/, '').split('&');
-          var sal = strArr.length;
-          var i;
-          var j;
-          var ct;
-          var p;
-          var lastObj;
-          var obj;
-          var undef;
-          var chr;
-          var tmp;
-          var key;
-          var value;
-          var postLeftBracketPos;
-          var keys;
-          var keysLen;
+        var strArr = String(str).replace(/^&/, '').replace(/&$/, '').split('&');
+        var sal = strArr.length;
+        var i;
+        var j;
+        var ct;
+        var p;
+        var lastObj;
+        var obj;
+        var undef;
+        var chr;
+        var tmp;
+        var key;
+        var value;
+        var postLeftBracketPos;
+        var keys;
+        var keysLen;
 
-          var _fixStr = function _fixStr(str) {
-            return decodeURIComponent(str.replace(/\+/g, '%20'));
-          };
-
-          var $global = typeof window !== 'undefined' ? window : global;
-          $global.$locutus = $global.$locutus || {};
-          var $locutus = $global.$locutus;
-          $locutus.php = $locutus.php || {};
-
-          if (!array) {
-            array = $global;
-          }
-
-          for (i = 0; i < sal; i++) {
-            tmp = strArr[i].split('=');
-            key = _fixStr(tmp[0]);
-            value = tmp.length < 2 ? '' : _fixStr(tmp[1]);
-
-            while (key.charAt(0) === ' ') {
-              key = key.slice(1);
-            }
-            if (key.indexOf('\x00') > -1) {
-              key = key.slice(0, key.indexOf('\x00'));
-            }
-            if (key && key.charAt(0) !== '[') {
-              keys = [];
-              postLeftBracketPos = 0;
-              for (j = 0; j < key.length; j++) {
-                if (key.charAt(j) === '[' && !postLeftBracketPos) {
-                  postLeftBracketPos = j + 1;
-                } else if (key.charAt(j) === ']') {
-                  if (postLeftBracketPos) {
-                    if (!keys.length) {
-                      keys.push(key.slice(0, postLeftBracketPos - 1));
-                    }
-                    keys.push(key.substr(postLeftBracketPos, j - postLeftBracketPos));
-                    postLeftBracketPos = 0;
-                    if (key.charAt(j + 1) !== '[') {
-                      break;
-                    }
-                  }
-                }
-              }
-              if (!keys.length) {
-                keys = [key];
-              }
-              for (j = 0; j < keys[0].length; j++) {
-                chr = keys[0].charAt(j);
-                if (chr === ' ' || chr === '.' || chr === '[') {
-                  keys[0] = keys[0].substr(0, j) + '_' + keys[0].substr(j + 1);
-                }
-                if (chr === '[') {
-                  break;
-                }
-              }
-
-              obj = array;
-              for (j = 0, keysLen = keys.length; j < keysLen; j++) {
-                key = keys[j].replace(/^['"]/, '').replace(/['"]$/, '');
-                lastObj = obj;
-                if (key !== '' && key !== ' ' || j === 0) {
-                  if (obj[key] === undef) {
-                    obj[key] = {};
-                  }
-                  obj = obj[key];
-                } else {
-                  // To insert new dimension
-                  ct = -1;
-                  for (p in obj) {
-                    if (obj.hasOwnProperty(p)) {
-                      if (+p > ct && p.match(/^\d+$/g)) {
-                        ct = +p;
-                      }
-                    }
-                  }
-                  key = ct + 1;
-                }
-              }
-              lastObj[key] = value;
-            }
-          }
+        var _fixStr = function _fixStr(str) {
+          return decodeURIComponent(str.replace(/\+/g, '%20'));
         };
-      }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
+
+        var $global = typeof window !== 'undefined' ? window : GLOBAL;
+        $global.$locutus = $global.$locutus || {};
+        var $locutus = $global.$locutus;
+        $locutus.php = $locutus.php || {};
+
+        if (!array) {
+          array = $global;
+        }
+
+        for (i = 0; i < sal; i++) {
+          tmp = strArr[i].split('=');
+          key = _fixStr(tmp[0]);
+          value = tmp.length < 2 ? '' : _fixStr(tmp[1]);
+
+          while (key.charAt(0) === ' ') {
+            key = key.slice(1);
+          }
+          if (key.indexOf('\x00') > -1) {
+            key = key.slice(0, key.indexOf('\x00'));
+          }
+          if (key && key.charAt(0) !== '[') {
+            keys = [];
+            postLeftBracketPos = 0;
+            for (j = 0; j < key.length; j++) {
+              if (key.charAt(j) === '[' && !postLeftBracketPos) {
+                postLeftBracketPos = j + 1;
+              } else if (key.charAt(j) === ']') {
+                if (postLeftBracketPos) {
+                  if (!keys.length) {
+                    keys.push(key.slice(0, postLeftBracketPos - 1));
+                  }
+                  keys.push(key.substr(postLeftBracketPos, j - postLeftBracketPos));
+                  postLeftBracketPos = 0;
+                  if (key.charAt(j + 1) !== '[') {
+                    break;
+                  }
+                }
+              }
+            }
+            if (!keys.length) {
+              keys = [key];
+            }
+            for (j = 0; j < keys[0].length; j++) {
+              chr = keys[0].charAt(j);
+              if (chr === ' ' || chr === '.' || chr === '[') {
+                keys[0] = keys[0].substr(0, j) + '_' + keys[0].substr(j + 1);
+              }
+              if (chr === '[') {
+                break;
+              }
+            }
+
+            obj = array;
+            for (j = 0, keysLen = keys.length; j < keysLen; j++) {
+              key = keys[j].replace(/^['"]/, '').replace(/['"]$/, '');
+              lastObj = obj;
+              if (key !== '' && key !== ' ' || j === 0) {
+                if (obj[key] === undef) {
+                  obj[key] = {};
+                }
+                obj = obj[key];
+              } else {
+                // To insert new dimension
+                ct = -1;
+                for (p in obj) {
+                  if (obj.hasOwnProperty(p)) {
+                    if (+p > ct && p.match(/^\d+$/g)) {
+                      ct = +p;
+                    }
+                  }
+                }
+                key = ct + 1;
+              }
+            }
+            lastObj[key] = value;
+          }
+        }
+      };
     }, {}], 11: [function (require, module, exports) {
       'use strict';
 
@@ -646,96 +638,94 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return (str + '').replace(re, '');
       };
     }, {}], 12: [function (require, module, exports) {
-      (function (global) {
-        'use strict';
+      'use strict';
 
-        var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
-          return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-        } : function (obj) {
-          return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
-        };
+      var _typeof = typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol" ? function (obj) {
+        return typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+      } : function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof2(obj);
+      };
 
-        module.exports = function str_replace(search, replace, subject, countObj) {
-          // eslint-disable-line camelcase
-          //  discuss at: http://locutus.io/php/str_replace/
-          // original by: Kevin van Zonneveld (http://kvz.io)
-          // improved by: Gabriel Paderni
-          // improved by: Philip Peterson
-          // improved by: Simon Willison (http://simonwillison.net)
-          // improved by: Kevin van Zonneveld (http://kvz.io)
-          // improved by: Onno Marsman (https://twitter.com/onnomarsman)
-          // improved by: Brett Zamir (http://brett-zamir.me)
-          //  revised by: Jonas Raoni Soares Silva (http://www.jsfromhell.com)
-          // bugfixed by: Anton Ongson
-          // bugfixed by: Kevin van Zonneveld (http://kvz.io)
-          // bugfixed by: Oleg Eremeev
-          // bugfixed by: Glen Arason (http://CanadianDomainRegistry.ca)
-          // bugfixed by: Glen Arason (http://CanadianDomainRegistry.ca)
-          //    input by: Onno Marsman (https://twitter.com/onnomarsman)
-          //    input by: Brett Zamir (http://brett-zamir.me)
-          //    input by: Oleg Eremeev
-          //      note 1: The countObj parameter (optional) if used must be passed in as a
-          //      note 1: object. The count will then be written by reference into it's `value` property
-          //   example 1: str_replace(' ', '.', 'Kevin van Zonneveld')
-          //   returns 1: 'Kevin.van.Zonneveld'
-          //   example 2: str_replace(['{name}', 'l'], ['hello', 'm'], '{name}, lars')
-          //   returns 2: 'hemmo, mars'
-          //   example 3: str_replace(Array('S','F'),'x','ASDFASDF')
-          //   returns 3: 'AxDxAxDx'
-          //   example 4: var countObj = {}
-          //   example 4: str_replace(['A','D'], ['x','y'] , 'ASDFASDF' , countObj)
-          //   example 4: var $result = countObj.value
-          //   returns 4: 4
+      module.exports = function str_replace(search, replace, subject, countObj) {
+        // eslint-disable-line camelcase
+        //  discuss at: http://locutus.io/php/str_replace/
+        // original by: Kevin van Zonneveld (http://kvz.io)
+        // improved by: Gabriel Paderni
+        // improved by: Philip Peterson
+        // improved by: Simon Willison (http://simonwillison.net)
+        // improved by: Kevin van Zonneveld (http://kvz.io)
+        // improved by: Onno Marsman (https://twitter.com/onnomarsman)
+        // improved by: Brett Zamir (http://brett-zamir.me)
+        //  revised by: Jonas Raoni Soares Silva (http://www.jsfromhell.com)
+        // bugfixed by: Anton Ongson
+        // bugfixed by: Kevin van Zonneveld (http://kvz.io)
+        // bugfixed by: Oleg Eremeev
+        // bugfixed by: Glen Arason (http://CanadianDomainRegistry.ca)
+        // bugfixed by: Glen Arason (http://CanadianDomainRegistry.ca)
+        //    input by: Onno Marsman (https://twitter.com/onnomarsman)
+        //    input by: Brett Zamir (http://brett-zamir.me)
+        //    input by: Oleg Eremeev
+        //      note 1: The countObj parameter (optional) if used must be passed in as a
+        //      note 1: object. The count will then be written by reference into it's `value` property
+        //   example 1: str_replace(' ', '.', 'Kevin van Zonneveld')
+        //   returns 1: 'Kevin.van.Zonneveld'
+        //   example 2: str_replace(['{name}', 'l'], ['hello', 'm'], '{name}, lars')
+        //   returns 2: 'hemmo, mars'
+        //   example 3: str_replace(Array('S','F'),'x','ASDFASDF')
+        //   returns 3: 'AxDxAxDx'
+        //   example 4: var countObj = {}
+        //   example 4: str_replace(['A','D'], ['x','y'] , 'ASDFASDF' , countObj)
+        //   example 4: var $result = countObj.value
+        //   returns 4: 4
 
-          var i = 0;
-          var j = 0;
-          var temp = '';
-          var repl = '';
-          var sl = 0;
-          var fl = 0;
-          var f = [].concat(search);
-          var r = [].concat(replace);
-          var s = subject;
-          var ra = Object.prototype.toString.call(r) === '[object Array]';
-          var sa = Object.prototype.toString.call(s) === '[object Array]';
-          s = [].concat(s);
+        var i = 0;
+        var j = 0;
+        var temp = '';
+        var repl = '';
+        var sl = 0;
+        var fl = 0;
+        var f = [].concat(search);
+        var r = [].concat(replace);
+        var s = subject;
+        var ra = Object.prototype.toString.call(r) === '[object Array]';
+        var sa = Object.prototype.toString.call(s) === '[object Array]';
+        s = [].concat(s);
 
-          var $global = typeof window !== 'undefined' ? window : global;
-          $global.$locutus = $global.$locutus || {};
-          var $locutus = $global.$locutus;
-          $locutus.php = $locutus.php || {};
+        var $global = typeof window !== 'undefined' ? window : GLOBAL;
+        $global.$locutus = $global.$locutus || {};
+        var $locutus = $global.$locutus;
+        $locutus.php = $locutus.php || {};
 
-          if ((typeof search === 'undefined' ? 'undefined' : _typeof(search)) === 'object' && typeof replace === 'string') {
-            temp = replace;
-            replace = [];
-            for (i = 0; i < search.length; i += 1) {
-              replace[i] = temp;
-            }
-            temp = '';
-            r = [].concat(replace);
-            ra = Object.prototype.toString.call(r) === '[object Array]';
+        if ((typeof search === 'undefined' ? 'undefined' : _typeof(search)) === 'object' && typeof replace === 'string') {
+          temp = replace;
+          replace = [];
+          for (i = 0; i < search.length; i += 1) {
+            replace[i] = temp;
           }
+          temp = '';
+          r = [].concat(replace);
+          ra = Object.prototype.toString.call(r) === '[object Array]';
+        }
 
-          if (typeof countObj !== 'undefined') {
-            countObj.value = 0;
+        if (typeof countObj !== 'undefined') {
+          countObj.value = 0;
+        }
+
+        for (i = 0, sl = s.length; i < sl; i++) {
+          if (s[i] === '') {
+            continue;
           }
-
-          for (i = 0, sl = s.length; i < sl; i++) {
-            if (s[i] === '') {
-              continue;
-            }
-            for (j = 0, fl = f.length; j < fl; j++) {
-              temp = s[i] + '';
-              repl = ra ? r[j] !== undefined ? r[j] : '' : r[0];
-              s[i] = temp.split(f[j]).join(repl);
-              if (typeof countObj !== 'undefined') {
-                countObj.value += temp.split(f[j]).length - 1;
-              }
+          for (j = 0, fl = f.length; j < fl; j++) {
+            temp = s[i] + '';
+            repl = ra ? r[j] !== undefined ? r[j] : '' : r[0];
+            s[i] = temp.split(f[j]).join(repl);
+            if (typeof countObj !== 'undefined') {
+              countObj.value += temp.split(f[j]).length - 1;
             }
           }
-          return sa ? s : s[0];
-        };
-      }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
+        }
+        return sa ? s : s[0];
+      };
     }, {}], 13: [function (require, module, exports) {
       'use strict';
 
@@ -856,45 +846,43 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return (iBeforeStrEnd > jBeforeStrEnd) - (iBeforeStrEnd < jBeforeStrEnd);
       };
     }, { "../_helpers/_phpCastString": 4 }], 14: [function (require, module, exports) {
-      (function (global) {
-        'use strict';
+      'use strict';
 
-        module.exports = function strtok(str, tokens) {
-          //  discuss at: http://locutus.io/php/strtok/
-          // original by: Brett Zamir (http://brett-zamir.me)
-          //      note 1: Use tab and newline as tokenizing characters as well
-          //   example 1: var $string = "\t\t\t\nThis is\tan example\nstring\n"
-          //   example 1: var $tok = strtok($string, " \n\t")
-          //   example 1: var $b = ''
-          //   example 1: while ($tok !== false) {$b += "Word="+$tok+"\n"; $tok = strtok(" \n\t");}
-          //   example 1: var $result = $b
-          //   returns 1: "Word=This\nWord=is\nWord=an\nWord=example\nWord=string\n"
+      module.exports = function strtok(str, tokens) {
+        //  discuss at: http://locutus.io/php/strtok/
+        // original by: Brett Zamir (http://brett-zamir.me)
+        //      note 1: Use tab and newline as tokenizing characters as well
+        //   example 1: var $string = "\t\t\t\nThis is\tan example\nstring\n"
+        //   example 1: var $tok = strtok($string, " \n\t")
+        //   example 1: var $b = ''
+        //   example 1: while ($tok !== false) {$b += "Word="+$tok+"\n"; $tok = strtok(" \n\t");}
+        //   example 1: var $result = $b
+        //   returns 1: "Word=This\nWord=is\nWord=an\nWord=example\nWord=string\n"
 
-          var $global = typeof window !== 'undefined' ? window : global;
-          $global.$locutus = $global.$locutus || {};
-          var $locutus = $global.$locutus;
-          $locutus.php = $locutus.php || {};
+        var $global = typeof window !== 'undefined' ? window : GLOBAL;
+        $global.$locutus = $global.$locutus || {};
+        var $locutus = $global.$locutus;
+        $locutus.php = $locutus.php || {};
 
-          if (tokens === undefined) {
-            tokens = str;
-            str = $locutus.php.strtokleftOver;
+        if (tokens === undefined) {
+          tokens = str;
+          str = $locutus.php.strtokleftOver;
+        }
+        if (str.length === 0) {
+          return false;
+        }
+        if (tokens.indexOf(str.charAt(0)) !== -1) {
+          return strtok(str.substr(1), tokens);
+        }
+        for (var i = 0; i < str.length; i++) {
+          if (tokens.indexOf(str.charAt(i)) !== -1) {
+            break;
           }
-          if (str.length === 0) {
-            return false;
-          }
-          if (tokens.indexOf(str.charAt(0)) !== -1) {
-            return strtok(str.substr(1), tokens);
-          }
-          for (var i = 0; i < str.length; i++) {
-            if (tokens.indexOf(str.charAt(i)) !== -1) {
-              break;
-            }
-          }
-          $locutus.php.strtokleftOver = str.substr(i + 1);
+        }
+        $locutus.php.strtokleftOver = str.substr(i + 1);
 
-          return str.substring(0, i);
-        };
-      }).call(this, typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {});
+        return str.substring(0, i);
+      };
     }, {}], 15: [function (require, module, exports) {
       'use strict';
 
@@ -990,13 +978,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
          * @public
          * @param  {object} permissions
          * @param  {array}  authzGroups
+         * @param  {array}  reverse     Returns an array where the priviliges are the keys and authzgroups the values
          * @return {array}
          */
 
 
         _createClass(PermissionMatcher, [{
           key: "match",
-          value: function match(permissions, authzGroups) {
+          value: function match(permissions, authzGroups, reverse) {
             var _this = this;
 
             var privileges = [];
@@ -1004,9 +993,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var _loop = function _loop(permissionAuthzGroup) {
               var permissionPrivileges = permissions[permissionAuthzGroup];
 
-              _this.hasMatchingAuthzGroup(permissionAuthzGroup, authzGroups, function (matches) {
-                if (!matches) return;
-                privileges.push(permissionPrivileges);
+              _this.hasMatchingAuthzGroup(permissionAuthzGroup, authzGroups, function (matchingAuthzGroup) {
+                if (!matchingAuthzGroup) return;
+
+                if (reverse) {
+                  privileges = _this.addAuthzGroupsToPrivileges(privileges, permissionPrivileges, [permissionAuthzGroup, matchingAuthzGroup]);
+                } else {
+                  privileges.push(permissionPrivileges);
+                }
               });
             };
 
@@ -1014,7 +1008,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               _loop(permissionAuthzGroup);
             };
 
-            return this.flatten(privileges);
+            return reverse ? privileges : this.flatten(privileges);
           }
 
           /**
@@ -1033,7 +1027,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
             authzGroups.forEach(function (authzGroup) {
               if (_this2.authzGroupsAreEqual(permissionAuthzGroup, authzGroup)) {
-                return callback(true);
+                return callback(authzGroup);
               }
             });
 
@@ -1149,6 +1143,29 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             });
 
             return [].concat(_toConsumableArray(new Set(list)));
+          }
+
+          /**
+           * Populate an array of privileges with their corresponding authz groups
+           *
+           * @protected
+           * @param  {array}        privileges
+           * @param  {string|array} authzGroupsPrivileges
+           * @param  {array}        authzGroups
+           * @return {array}
+           */
+
+        }, {
+          key: "addAuthzGroupsToPrivileges",
+          value: function addAuthzGroupsToPrivileges(privileges, authzGroupsPrivileges, authzGroups) {
+            var authzPriviliges = typeof authzGroupsPrivileges !== 'string' ? authzGroupsPrivileges : [authzGroupsPrivileges];
+
+            authzPriviliges.forEach(function (privilige) {
+              privileges[privilige] = privileges[privilige] ? privileges[privilige] : [];
+              privileges[privilige] = [].concat(_toConsumableArray(new Set(array_merge(privileges[privilige], authzGroups))));
+            });
+
+            return privileges;
           }
 
           /**

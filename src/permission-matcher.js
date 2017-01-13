@@ -20,21 +20,27 @@ class PermissionMatcher {
      * @public
      * @param  {object} permissions
      * @param  {array}  authzGroups
+     * @param  {array}  reverse     Returns an array where the priviliges are the keys and authzgroups the values
      * @return {array}
      */
-    match (permissions, authzGroups) {
-        const privileges = [];
+    match (permissions, authzGroups, reverse) {
+        let privileges = [];
 
         for (let permissionAuthzGroup in permissions) {
             const permissionPrivileges = permissions[permissionAuthzGroup];
 
-            this.hasMatchingAuthzGroup(permissionAuthzGroup, authzGroups, (matches) => {
-                if (!matches) return;
-                privileges.push(permissionPrivileges);
+            this.hasMatchingAuthzGroup(permissionAuthzGroup, authzGroups, (matchingAuthzGroup) => {
+                if (!matchingAuthzGroup) return;
+
+                if (reverse) {
+                    privileges = this.addAuthzGroupsToPrivileges(privileges, permissionPrivileges, [permissionAuthzGroup, matchingAuthzGroup]);
+                } else {
+                    privileges.push(permissionPrivileges);
+                }
             });
         };
 
-        return this.flatten(privileges);
+        return reverse ? privileges : this.flatten(privileges);
     }
 
     /**
@@ -48,7 +54,7 @@ class PermissionMatcher {
     hasMatchingAuthzGroup (permissionAuthzGroup, authzGroups, callback) {
         authzGroups.forEach((authzGroup) => {
             if (this.authzGroupsAreEqual(permissionAuthzGroup, authzGroup)) {
-                return callback(true);
+                return callback(authzGroup);
             }
         });
 
@@ -148,6 +154,26 @@ class PermissionMatcher {
         });
 
         return [...new Set(list)];
+    }
+
+    /**
+     * Populate an array of privileges with their corresponding authz groups
+     *
+     * @protected
+     * @param  {array}        privileges
+     * @param  {string|array} authzGroupsPrivileges
+     * @param  {array}        authzGroups
+     * @return {array}
+     */
+    addAuthzGroupsToPrivileges (privileges, authzGroupsPrivileges, authzGroups) {
+        const authzPriviliges = typeof authzGroupsPrivileges !== 'string' ? authzGroupsPrivileges : [authzGroupsPrivileges];
+
+        authzPriviliges.forEach((privilige) => {
+            privileges[privilige] = privileges[privilige] ? privileges[privilige] : [];
+            privileges[privilige] = [...new Set(array_merge(privileges[privilige], authzGroups))];
+        });
+
+        return privileges;
     }
 
     /**
