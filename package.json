@@ -1,6 +1,6 @@
 {
   "name": "permission-matcher-js",
-  "version": "1.0.4",
+  "version": "1.0.0",
   "description": "JavaScript port of legalthings/permission-matcher",
   "main": "src/permission-matcher.js",
   "scripts": {
