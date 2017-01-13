@@ -1,11 +1,26 @@
 language: node_js
-
 node_js:
-  - "5.11"
+  - '5.11'
 
 branches:
   only:
   - master
 
+before_install:
+  - git config --global user.email "travis-ci@legalthings.net"
+  - git config --global user.name "Travis CI"
+  - git fetch origin 'refs/tags/*:refs/tags/*'
+
+after_success:
+  - npm install mversion -g
+  - test "$TRAVIS_BRANCH" != 'master' -o "$TRAVIS_PULL_REQUEST" != "false" || test -n "$(git tag --contains)" || bin/bump-version
+
 script:
-- npm test
+  - npm test
+
+deploy:
+  provider: npm
+  api_key:
+    secure: IUpo/p9sAoJhbSprXbs+Z7QJdohKZHijePYG46tMZ+XX4UgXLWOL1kosC8V2Yc5Ax1MS7g0PLhgOuvq8Zdf7aIJ2ymnY/dKjZbBX3du030HLl2XNV9fQ7EnXSO64XLHSnmNEorNJfvfPGz9hV7gc2pjF2rgdRqdPtuoZt0mxtJRH+xLftrSUM/eKiWri1YvKoT4TZdkZWzuVxJcFs3YIAiULVFBlW9xMnCa7251m6fbZ2/a5w4GOdO0VFVh9P1ZJ41E+wQx7l9r2vcJ07891JZ0TNilNAKZH5MsI8QElYGsnvBoTnwSCkGLJV2hc18Tl5KCr99KqMdRHGgS3ELLVrSwRL7msuEeF3HRiVrIojBMJjSOsJnEFTLEGh7TlFYhNidU5uZqoqU6zBfaHvbNOj4M0Fstw2X38+bDYKuued9cPOnMOecll6aRTKU7S81aEuJYwvTacT2EomW4bKCHyyYTtEQVzwGu9ZxBnLEBBqgtlbGoJZd6S7TYNBVQJ0Xh0AUXVtBYOHpD+fOO32y0xVp/GGZh4A9MnaMn25P5y0BZZ83+cHFU7awmZpTVk0Y1zi8duzMrXLDtdhpOYTG6IcX2xUScbc2nTi5YWFtI50I5t0fHBSYEMIP0u1yj4jUMTf3d+FFtXM4xXVH1SCsWk1DhneTJ7Dyx9JYRxUwa3HWk=
+  on:
+    branch: master
