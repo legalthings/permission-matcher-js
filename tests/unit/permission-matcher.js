@@ -16,7 +16,9 @@ describe('PermissionMatcher', function() {
         it('should match resources with wildcard query params', testMatchWildcardResource);
         it('should match resources with insensitive query params', testMatchCaseInsensitiveQueryParams);
         it('should match inverted permissions', testMatchInverted);
-        it('should match permissions where the priviliges are the keys and authzgroups the values', testMatchReverse);
+    });
+    describe('#matchFull()', function() {
+        it('should match permissions and return a full list of privileges objects', testMatchFull);
     });
 });
 
@@ -160,7 +162,7 @@ function testMatchInverted () {
     assert.deepEqual(matcher.match(permissions, ['foo']), ['read']);
 }
 
-function testMatchReverse () {
+function testMatchFull () {
     const permissions = {
         'admin': 'read',
         'admin.support': 'write',
@@ -171,28 +173,28 @@ function testMatchReverse () {
         '*.support': 'dance'
     };
     
-    assert.deepEqual(matcher.match(permissions, ['admin'], true), {
+    assert.deepEqual(matcher.matchFull(permissions, ['admin']), {
         'read': ['admin']
     });
 
-    assert.deepEqual(matcher.match(permissions, ['admin.*'], true), {
+    assert.deepEqual(matcher.matchFull(permissions, ['admin.*']), {
         'write': ['admin.support', 'admin.*'],
         'develop': ['admin.dev', 'admin.*'],
         'test': ['admin.dev.tester', 'admin.*']
     });
 
-    assert.deepEqual(matcher.match(permissions, ['admin.*.*'], true), {
+    assert.deepEqual(matcher.matchFull(permissions, ['admin.*.*']), {
         'test': ['admin.dev.tester', 'admin.*.*']
     });
     
-    assert.deepEqual(matcher.match(permissions, ['admin', 'admin.*'], true), {
+    assert.deepEqual(matcher.matchFull(permissions, ['admin', 'admin.*']), {
         'read': ['admin'],
         'write': ['admin.support', 'admin.*'],
         'develop': ['admin.dev', 'admin.*'],
         'test': ['admin.dev.tester', 'admin.*']
     });
 
-    assert.deepEqual(matcher.match(permissions, ['admin.d*'], true), {
+    assert.deepEqual(matcher.matchFull(permissions, ['admin.d*']), {
         'develop': ['admin.dev', 'admin.d*'],
         'test': ['admin.dev.tester', 'admin.d*']
     });

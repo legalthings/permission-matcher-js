@@ -973,19 +973,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
 
         /**
-         * Get a list of privileges for matching authz groups
+         * Get a flat list of privileges for matching authz groups
          *
          * @public
          * @param  {object} permissions
          * @param  {array}  authzGroups
-         * @param  {array}  reverse     Returns an array where the priviliges are the keys and authzgroups the values
          * @return {array}
          */
 
 
         _createClass(PermissionMatcher, [{
           key: "match",
-          value: function match(permissions, authzGroups, reverse) {
+          value: function match(permissions, authzGroups) {
             var _this = this;
 
             var privileges = [];
@@ -993,14 +992,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             var _loop = function _loop(permissionAuthzGroup) {
               var permissionPrivileges = permissions[permissionAuthzGroup];
 
-              _this.hasMatchingAuthzGroup(permissionAuthzGroup, authzGroups, function (matchingAuthzGroup) {
+              _this.getMatchingAuthzGroup(permissionAuthzGroup, authzGroups, function (matchingAuthzGroup) {
                 if (!matchingAuthzGroup) return;
-
-                if (reverse) {
-                  privileges = _this.addAuthzGroupsToPrivileges(privileges, permissionPrivileges, [permissionAuthzGroup, matchingAuthzGroup]);
-                } else {
-                  privileges.push(permissionPrivileges);
-                }
+                privileges.push(permissionPrivileges);
               });
             };
 
@@ -1008,7 +1002,40 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               _loop(permissionAuthzGroup);
             };
 
-            return reverse ? privileges : this.flatten(privileges);
+            return this.flatten(privileges);
+          }
+
+          /**
+           * Get a list of privileges for matching authz groups containing more information
+           * Returns an array of objects where the privilege is the key and authzgroups the value
+           *
+           * @public
+           * @param  {object} permissions
+           * @param  {array}  authzGroups
+           * @return {array}
+           */
+
+        }, {
+          key: "matchFull",
+          value: function matchFull(permissions, authzGroups) {
+            var _this2 = this;
+
+            var privileges = [];
+
+            var _loop2 = function _loop2(permissionAuthzGroup) {
+              var permissionPrivileges = permissions[permissionAuthzGroup];
+
+              _this2.getMatchingAuthzGroup(permissionAuthzGroup, authzGroups, function (matchingAuthzGroup) {
+                if (!matchingAuthzGroup) return;
+                privileges = _this2.addAuthzGroupsToPrivileges(privileges, permissionPrivileges, [permissionAuthzGroup, matchingAuthzGroup]);
+              });
+            };
+
+            for (var permissionAuthzGroup in permissions) {
+              _loop2(permissionAuthzGroup);
+            };
+
+            return privileges;
           }
 
           /**
@@ -1021,17 +1048,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
            */
 
         }, {
-          key: "hasMatchingAuthzGroup",
-          value: function hasMatchingAuthzGroup(permissionAuthzGroup, authzGroups, callback) {
-            var _this2 = this;
+          key: "getMatchingAuthzGroup",
+          value: function getMatchingAuthzGroup(permissionAuthzGroup, authzGroups, callback) {
+            var _this3 = this;
 
             authzGroups.forEach(function (authzGroup) {
-              if (_this2.authzGroupsAreEqual(permissionAuthzGroup, authzGroup)) {
+              if (_this3.authzGroupsAreEqual(permissionAuthzGroup, authzGroup)) {
                 return callback(authzGroup);
               }
             });
 
-            callback(false);
+            callback(null);
           }
 
           /**
@@ -1158,11 +1185,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, {
           key: "addAuthzGroupsToPrivileges",
           value: function addAuthzGroupsToPrivileges(privileges, authzGroupsPrivileges, authzGroups) {
-            var authzPriviliges = typeof authzGroupsPrivileges !== 'string' ? authzGroupsPrivileges : [authzGroupsPrivileges];
+            var authzPrivileges = typeof authzGroupsPrivileges !== 'string' ? authzGroupsPrivileges : [authzGroupsPrivileges];
 
-            authzPriviliges.forEach(function (privilige) {
-              privileges[privilige] = privileges[privilige] ? privileges[privilige] : [];
-              privileges[privilige] = [].concat(_toConsumableArray(new Set(array_merge(privileges[privilige], authzGroups))));
+            authzPrivileges.forEach(function (privilege) {
+              var current = privileges[privilege] ? privileges[privilege] : [];
+              privileges[privilege] = [].concat(_toConsumableArray(new Set(array_merge(current, authzGroups))));
             });
 
             return privileges;
