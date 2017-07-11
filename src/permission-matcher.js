@@ -27,11 +27,13 @@ class PermissionMatcher {
 
         for (let permissionAuthzGroup in permissions) {
             const permissionPrivileges = permissions[permissionAuthzGroup];
+            const matchingAuthzGroup = this.getMatchingAuthzGroup(permissionAuthzGroup, authzGroups);
 
-            this.getMatchingAuthzGroup(permissionAuthzGroup, authzGroups, (matchingAuthzGroup) => {
-                if (!matchingAuthzGroup) return;
-                privileges.push(permissionPrivileges);
-            });
+            if (!matchingAuthzGroup) {
+                continue;
+            }
+
+            privileges.push(permissionPrivileges);
         };
 
         return this.flatten(privileges);
@@ -51,13 +53,15 @@ class PermissionMatcher {
 
         for (let permissionAuthzGroup in permissions) {
             const permissionPrivileges = permissions[permissionAuthzGroup];
+            const matchingAuthzGroup = this.getMatchingAuthzGroup(permissionAuthzGroup, authzGroups);
 
-            this.getMatchingAuthzGroup(permissionAuthzGroup, authzGroups, (matchingAuthzGroup) => {
-                if (!matchingAuthzGroup) return;
-                privileges = this.addAuthzGroupsToPrivileges(privileges, permissionPrivileges, [
-                    permissionAuthzGroup, matchingAuthzGroup
-                ]);
-            });
+            if (!matchingAuthzGroup) {
+                continue;
+            }
+
+            privileges = this.addAuthzGroupsToPrivileges(privileges, permissionPrivileges, [
+                permissionAuthzGroup, matchingAuthzGroup
+            ]);
         };
 
         return privileges;
@@ -67,18 +71,32 @@ class PermissionMatcher {
      * Check if one of the authz groups match
      *
      * @protected
-     * @param {string}   permissionAuthzGroup
-     * @param {array}    authzGroups
-     * @param {function} callback
+     * @param  {string}      permissionAuthzGroup
+     * @param  {array}       authzGroups
+     * @return {string|null}
      */
-    getMatchingAuthzGroup (permissionAuthzGroup, authzGroups, callback) {
-        authzGroups.forEach((authzGroup) => {
-            if (this.authzGroupsAreEqual(permissionAuthzGroup, authzGroup)) {
-                return callback(authzGroup);
-            }
-        });
+    getMatchingAuthzGroup (permissionAuthzGroup, authzGroups) {
+        const invert = this.stringStartsWith(permissionAuthzGroup, '!');
 
-        callback(null);
+        if (invert) {
+            permissionAuthzGroup = permissionAuthzGroup.substr(1);
+        }
+
+        const matches = [];
+
+        for (const authzGroup of authzGroups) {
+            const match = this.authzGroupsAreEqual(permissionAuthzGroup, authzGroup);
+
+            if (match && invert) {
+                return null;
+            }
+
+            if (match && !invert || !match && invert) {
+                matches.push(authzGroup);
+            }
+        };
+
+        return matches.length ? matches[0] : null;
     }
 
     /**
@@ -122,11 +140,9 @@ class PermissionMatcher {
         regex = str_replace('\\*', '(.*)', regex);
         regex = new RegExp(regex, 'i');
 
-        const token = '!';
-        const invert = pattern.substr(0, token.length) === token;
         const match = subject.match(regex);
 
-        return invert ? !match : match;
+        return match;
     }
 
     /**
@@ -169,9 +185,9 @@ class PermissionMatcher {
     flatten (input) {
         let list = [];
 
-        input.forEach((item) => {
+        for (const item of input) {
             list = array_merge(list, [].concat(item));
-        });
+        }
 
         return [...new Set(list)];
     }
@@ -188,12 +204,24 @@ class PermissionMatcher {
     addAuthzGroupsToPrivileges (privileges, authzGroupsPrivileges, authzGroups) {
         const authzPrivileges = typeof authzGroupsPrivileges !== 'string' ? authzGroupsPrivileges : [authzGroupsPrivileges];
 
-        authzPrivileges.forEach((privilege) => {
+        for (const privilege of authzPrivileges) {
             const current = privileges[privilege] ? privileges[privilege] : [];
             privileges[privilege] = [...new Set(array_merge(current, authzGroups))];
-        });
+        };
 
         return privileges;
+    }
+
+    /**
+     * Check if a string starts with given substring
+     *
+     * @param  {string}  haystack
+     * @param  {string}  needle
+     * @return {boolean}
+     */
+    stringStartsWith (haystack, needle)
+    {
+        return haystack.substring(0, needle.length) === needle
     }
 
     /**
