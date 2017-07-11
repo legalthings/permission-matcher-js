@@ -154,12 +154,15 @@ function testMatchCaseInsensitiveQueryParams () {
 
 function testMatchInverted () {
     const permissions = {
-        '!admin': 'read',
+        'dev': ['develop'],
+        '!admin': 'foo',
         'admin': ['read', 'write']
     };
+    assert.deepEqual(matcher.match(permissions, ['dev']), ['develop', 'foo']);
+    assert.deepEqual(matcher.match(permissions, ['dev', 'admin']), ['develop', 'read', 'write']);
+    assert.deepEqual(matcher.match(permissions, ['bar']), ['foo']);
     assert.deepEqual(matcher.match(permissions, ['admin']), ['read', 'write']);
-    assert.deepEqual(matcher.match(permissions, ['guest']), ['read']);
-    assert.deepEqual(matcher.match(permissions, ['foo']), ['read']);
+    assert.deepEqual(matcher.match(permissions, ['guest', 'admin']), ['read', 'write']);
 }
 
 function testMatchFull () {
